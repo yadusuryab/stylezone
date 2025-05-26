@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { sanityClient } from "@/lib/sanity";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+interface Props {
+  params: Promise<{ id: string }>;
+}
+export async function GET(request: Request, { params }: Props) {
+  const { id } = await params;
 
   const query = `*[_type == "product" && _id == $id][0]{
     _id,
@@ -30,10 +30,11 @@ export async function GET(
     }
 
     // Transform images to array of URLs
-    const images = product.images?.map((img: any) => ({
-      url: img.asset.url,
-      title: img.asset.title,
-    })) || [];
+    const images =
+      product.images?.map((img: any) => ({
+        url: img.asset.url,
+        title: img.asset.title,
+      })) || [];
 
     return NextResponse.json({ ...product, images });
   } catch (error) {
