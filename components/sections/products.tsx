@@ -11,7 +11,7 @@ type Props = {
   desc?:string;
   showViewAll?: boolean;
   deskCols?: number;
-  rating:number;
+ 
 };
 
 function ProductsSection({
@@ -19,7 +19,7 @@ function ProductsSection({
   title = "🔥 Fresh Picks for Your Fit",
   desc = "",
   showViewAll = false,
-  rating ,
+ 
   deskCols = 4
 }: Props) {
   const [loading, setLoading] = useState(true);

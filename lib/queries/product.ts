@@ -1,7 +1,7 @@
 import { sanityClient } from "../sanity";
 
 export type Product = {
-  rating: number | undefined;
+  rating: number;
   _id: string;
   name: string;
   images: { url: string; title?: string }[];
