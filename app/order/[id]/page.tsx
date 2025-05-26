@@ -113,6 +113,22 @@ export default function OrderPage({ params }: Props) {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
+  const generateWhatsAppMessage = (order: Order) => {
+    const productsText = order.products
+      .map(
+        (item) =>
+          `${item.product.title} (Qty: ${item.quantity}, Size: ${item.size}${
+            item.color ? `, Color: ${item.color}` : ""
+          }) - ₹${item.product.price * item.quantity}`
+      )
+      .join("\n");
+
+    return `Hi, I have a question about my order #${order._id
+      .slice(-6)
+      .toUpperCase()}\n\nProducts:\n${productsText}\n\nTotal: ₹${
+      order.totalAmount
+    }\n\nOrder Status: ${order.orderStatus}`;
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -129,6 +145,17 @@ export default function OrderPage({ params }: Props) {
               Print Invoice
             </Button>
           )}
+          <Button
+            variant="outline"
+            onClick={() => {
+              const message = encodeURIComponent(
+                generateWhatsAppMessage(order)
+              );
+              window.open(`https://wa.me/+918129467976?text=${message}`, "_blank");
+            }}
+          >
+            Message on WhatsApp
+          </Button>
         </div>
       </div>
 
@@ -138,13 +165,13 @@ export default function OrderPage({ params }: Props) {
             <CardTitle>Products</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.products.map((item, index) => (
+            {order.products.map((item: any, index) => (
               <div
                 key={index}
                 className="flex gap-4 border-b pb-4 last:border-b-0"
               >
                 <Image
-                  src={urlFor(item.product.image)?.url()}
+                  src={urlFor(item.product.images[0])?.url()}
                   alt={item.product.title}
                   width={80}
                   height={80}
@@ -273,4 +300,3 @@ export default function OrderPage({ params }: Props) {
     </div>
   );
 }
-
