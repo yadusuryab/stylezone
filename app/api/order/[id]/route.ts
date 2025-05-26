@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { sanityClient } from "@/lib/sanity";
 
+interface Props {
+  params: Promise<{ id: string }>;
+}
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: Props
 ) {
-  const { id } = params;
+  const { id } =await params;
 
   try {
     const order = await sanityClient.fetch(
