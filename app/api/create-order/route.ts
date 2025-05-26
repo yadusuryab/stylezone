@@ -1,8 +1,8 @@
 // app/api/create-order/route.ts
 import { NextResponse } from "next/server";
 
-import { Telegram } from "@/lib/telegram";
 import { sanityClient } from "@/lib/sanity";
+import { TelegramService } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Send Telegram notification
-    await Telegram.sendOrderNotification(createdOrder);
+    await TelegramService.sendOrderNotification(createdOrder);
 
     return NextResponse.json(
       { success: true, orderId: createdOrder._id },
