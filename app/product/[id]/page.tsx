@@ -12,14 +12,14 @@ import StarRating_Basic from "@/components/commerce-ui/star-rating-basic";
 import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const { id } = params;
+  const { id } = await params;
   const product = await getProduct(id);
 
   if (!product) {
@@ -88,7 +88,7 @@ export async function generateMetadata(
 }
 
 const ProductPage = async ({ params }: Props) => {
-  const { id } = params;
+  const { id } =await params;
   const product = await getProduct(id);
 
   if (!product) {
