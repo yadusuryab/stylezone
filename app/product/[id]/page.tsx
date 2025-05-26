@@ -45,7 +45,7 @@ export async function generateMetadata(
     openGraph: {
       title: product.name,
       description: product.description || `${product.name} available for purchase`,
-      url: `https://stylezone.vercel.app/product/${id}`,
+      url: `https://thestylezone.in/product/${id}`,
       type: "website", // Changed from "product" to "website" which is allowed
       images: productImage ? [productImage, ...previousImages] : previousImages,
       // Add product-specific data as additional properties
@@ -82,7 +82,7 @@ export async function generateMetadata(
       }),
     },
     alternates: {
-      canonical: `https://stylezone.vercel.app/product/${id}`,
+      canonical: `https://thestylezone.in/product/${id}`,
     },
   };
 }
@@ -123,7 +123,7 @@ const ProductPage = async ({ params }: Props) => {
     },
     offers: {
       "@type": "Offer",
-      url: `https://stylezone.vercel.app/product/${id}`,
+      url: `https://thestylezone.in/product/${id}`,
       priceCurrency: "INR",
       price: product.salesPrice || product.price,
       priceValidUntil: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString().split('T')[0], // 30 days from now

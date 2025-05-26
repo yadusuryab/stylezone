@@ -86,7 +86,7 @@ ${order.district}, ${order.state} - ${order.pincode}
   }
 
   private static getProductUrl(productId: string): string {
-    return `https://stylezone.vercel.app/product/${productId}`;
+    return `https://thestylezone.in/product/${productId}`;
   }
 
   public static async sendMessage(

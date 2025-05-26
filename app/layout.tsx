@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://stylezone.vercel.app"), // Replace with your real domain
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://thestylezone.in"), // Replace with your real domain
   title: {
     default: "Stylezone | Premium First Copy Shoes Store in Kerala",
     template: "%s | Stylezone"
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "Stylezone | Premium First Copy Shoes Store in Kerala",
     description:
       "Shop premium first copy shoes and sneakers in Kerala. Affordable, stylish and durable footwear available at Stylezone.",
-    url: process.env.NEXT_PUBLIC_BASE_URL || "https://stylezone.vercel.app",
+    url: process.env.NEXT_PUBLIC_BASE_URL || "https://thestylezone.in",
     siteName: "Stylezone",
     images: [
       {
