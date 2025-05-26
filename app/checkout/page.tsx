@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -14,9 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { checkoutSchema } from "@/lib/validations";
+import { QRCodeCanvas } from "qrcode.react";
 import { Loader2 } from "lucide-react";
-import {QRCodeCanvas} from "qrcode.react";
-import Image from "next/image";
 
 type CartItem = {
   _id: string;
@@ -32,11 +30,11 @@ type FormData = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [paymentMode, setPaymentMode] = useState<"cod" | "online">("cod");
-  const [shippingCharges, setShippingCharges] = useState(200);
+  const [shippingCharges] = useState(30); // Fixed shipping for online payments
   const [showPayment, setShowPayment] = useState(false);
   const [transactionId, setTransactionId] = useState("");
   const [qrCodeValue, setQrCodeValue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
 
@@ -53,21 +51,17 @@ export default function CheckoutPage() {
     setCart(cartData);
   }, []);
 
-  useEffect(() => {
-    setShippingCharges(paymentMode === "cod" ? 200 : 30);
-  }, [paymentMode]);
-
   const subtotal = cart.reduce((acc, item) => acc + item.salesPrice * item.cartQty, 0);
   const total = subtotal + shippingCharges;
 
   const generateUpiLink = (amount: number) => {
-    const upiId = "your.upi@id"; // Replace with your actual UPI ID
+    const upiId = "8129467976@ybl"; // Replace with your actual UPI ID
     const note = `Payment for order`;
-    return `upi://pay?pa=${upiId}&pn=Your%20Store%20Name&am=${amount}&tn=${note}`;
+    return `upi://pay?pa=${upiId}&pn=Stylezone&am=${amount}&tn=${note}`;
   };
 
   const handleOrder = async (data: FormData) => {
-    if (paymentMode === "online" && !showPayment) {
+    if (!showPayment) {
       // Generate UPI link with amount
       setQrCodeValue(generateUpiLink(total));
       // Save form data to localStorage for payment step
@@ -76,6 +70,7 @@ export default function CheckoutPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const orderData = {
         ...data,
@@ -85,15 +80,14 @@ export default function CheckoutPage() {
           size: p.size,
           color: p.color,
         })),
-        paymentMode,
+        paymentMode: "online" as const,
         shippingCharges,
         totalAmount: total,
-        paymentStatus: paymentMode === "cod" ? false : true,
-        transactionId: paymentMode === "online" ? transactionId : undefined,
+        paymentStatus: true,
+        transactionId,
       };
-     
 
-      const response : any = await fetch("/api/create-order", {
+      const response = await fetch("/api/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,17 +98,17 @@ export default function CheckoutPage() {
       if (!response.ok) {
         throw new Error("Failed to create order");
       }
-     
+
+      const respdata = await response.json();
       localStorage.removeItem("cart");
-      if (paymentMode === "online") {
-        localStorage.removeItem("pendingOrder");
-      }
-        const respdata = await response.json()
+      localStorage.removeItem("pendingOrder");
       
       router.push(`/order/${respdata.orderId}`);
     } catch (error) {
-      toast.error("Failed to place order. Please try again.")
+      toast.error("Failed to place order. Please try again.");
       console.error("Order error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -179,6 +173,7 @@ export default function CheckoutPage() {
                   value={transactionId}
                   onChange={(e) => setTransactionId(e.target.value)}
                   placeholder="Enter transaction ID from payment app"
+                  required
                 />
                 <p className="text-sm text-muted-foreground">
                   Please enter the transaction ID after payment for verification.
@@ -196,10 +191,17 @@ export default function CheckoutPage() {
               </Button>
               <Button
                 onClick={handleSubmit(handleOrder)}
-                disabled={!transactionId}
+                disabled={!transactionId || isSubmitting}
                 className="w-full"
               >
-                Confirm Payment
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Confirm Payment"
+                )}
               </Button>
             </div>
           </CardContent>
@@ -356,44 +358,8 @@ export default function CheckoutPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Method</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup
-                value={paymentMode}
-                onValueChange={(value: "cod" | "online") => setPaymentMode(value)}
-                className="grid grid-cols-2 gap-4"
-              >
-                <div>
-                  <RadioGroupItem value="cod" id="cod" className="peer sr-only" />
-                  <Label
-                    htmlFor="cod"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Cash on Delivery
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem
-                    value="online"
-                    id="online"
-                    className="peer sr-only"
-                  />
-                  <Label
-                    htmlFor="online"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Online Payment
-                  </Label>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
-
           <Button type="submit" className="w-full" size="lg">
-            {paymentMode === "online" ? "Proceed to Payment" : "Place Order"}
+            Proceed to Payment
           </Button>
         </form>
       )}

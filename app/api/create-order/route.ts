@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       })),
     });
 
+
     // 2. Update product quantities
     for (const item of orderData.products) {
       // Get current product data
@@ -41,9 +42,25 @@ export async function POST(request: Request) {
         })
         .commit();
     }
-
     // 3. Send Telegram notification
-    await TelegramService.sendOrderNotification(createdOrder);
+const fullOrder = await sanityClient.fetch(
+  `*[_type == "order" && _id == $id][0]{
+    ...,
+    products[]{
+      quantity,
+      size,
+      color,
+      product->{
+        _id,
+        name,
+      }
+    }
+  }`,
+  { id: createdOrder._id }
+);
+
+await TelegramService.sendOrderNotification(fullOrder);
+
 
     return NextResponse.json(
       { success: true, orderId: createdOrder._id },

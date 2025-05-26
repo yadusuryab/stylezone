@@ -136,10 +136,8 @@ export default function OrderPage({ params }: Props) {
         <h1 className="text-2xl font-bold">
           Order #{order._id.slice(-6).toUpperCase()}
         </h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push("/track-order")}>
-            Back to Orders
-          </Button>
+        <div className="flex gap-1 overflow-hidden">
+        
           {order.paymentMode === "online" && (
             <Button variant="outline" onClick={() => window.print()}>
               Print Invoice

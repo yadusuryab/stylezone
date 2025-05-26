@@ -49,6 +49,7 @@ export class TelegramService {
     }
   }
 
+
   private static formatOrderMessage(order: Order): string {
     const paymentMethod = order.paymentMode === 'cod' 
       ? 'Cash on Delivery' 
@@ -123,6 +124,7 @@ ${order.district}, ${order.state} - ${order.pincode}
   public static async sendOrderNotification(order: any): Promise<boolean> {
     try {
       this.validateConfig();
+       
       const message = this.formatOrderMessage(order);
       return await this.sendMessage(message);
     } catch (error) {
