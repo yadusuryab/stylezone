@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Product } from '@/lib/queries/product';
@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ProductsSection from '@/components/sections/products';
 import { cn } from '@/lib/utils';
 
-export default function ProductsPage() {
+ function ProductsPageComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
@@ -415,5 +415,12 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading filters...</div>}>
+      <ProductsPageComponent />
+    </Suspense>
   );
 }
