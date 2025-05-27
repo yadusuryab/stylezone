@@ -39,6 +39,7 @@ export async function GET(
             title,
             slug,
             price,
+            salesPrice,
             images,
             quantity,
             soldOut

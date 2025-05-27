@@ -14,6 +14,7 @@ type Product = {
   _id: string;
   title: string;
   price: number;
+  salesPrice: number;
   image: string;
 };
 
@@ -41,6 +42,7 @@ type Order = {
   shippingCharges: number;
   orderStatus: string;
   orderedAt: string;
+ 
   totalAmount: number;
 };
 
@@ -110,7 +112,7 @@ export default function OrderPage({ params }: Props) {
   }
 
   const subtotal = order.products.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + item.product.salesPrice * item.quantity,
     0
   );
   const generateWhatsAppMessage = (order: Order) => {
@@ -119,7 +121,7 @@ export default function OrderPage({ params }: Props) {
         (item) =>
           `${item.product.title} (Qty: ${item.quantity}, Size: ${item.size}${
             item.color ? `, Color: ${item.color}` : ""
-          }) - ₹${item.product.price * item.quantity}`
+          }) - ₹${item.product.salesPrice * item.quantity}`
       )
       .join("\n");
 
@@ -180,7 +182,7 @@ export default function OrderPage({ params }: Props) {
                   <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                     <div>
                       <span className="text-muted-foreground">Price:</span>{" "}
-                      <span>₹{item.product.price}</span>
+                      <span>₹{item.product.salesPrice}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Qty:</span>{" "}
@@ -198,7 +200,7 @@ export default function OrderPage({ params }: Props) {
                     )}
                     <div className="col-span-2">
                       <span className="text-muted-foreground">Total:</span>{" "}
-                      <span>₹{item.product.price * item.quantity}</span>
+                      <span>₹{item.product.salesPrice * item.quantity}</span>
                     </div>
                   </div>
                 </div>
