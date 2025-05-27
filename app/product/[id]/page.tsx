@@ -112,13 +112,13 @@ const ProductPage = async ({ params }: Props) => {
       "@type": "Review",
       reviewRating: {
         "@type": "Rating",
-        ratingValue: product.rating.toString(),
+        ratingValue: product.rating?.toString() || '5',
         bestRating: "5",
       },
     },
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: product.rating.toString(),
+      ratingValue: product.rating?.toString() || '5',
       reviewCount: product.reviewCount?.toString() || "0",
     },
     offers: {
