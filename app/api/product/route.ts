@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
     // Base query conditions
     let conditions = [
       '_type == "product"',
-      `price >= ${minPrice}`,
-      `price <= ${maxPrice}`
+      `salesPrice >= ${minPrice}`,
+      `salesPrice <= ${maxPrice}`
     ]
 
     if (category) conditions.push(`category->slug.current == "${category}"`)
