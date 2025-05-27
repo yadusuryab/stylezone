@@ -1,7 +1,6 @@
 import { sanityClient } from '@/lib/sanity'
 import { NextRequest, NextResponse } from 'next/server'
 
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const home = searchParams.get('home')
@@ -11,26 +10,42 @@ export async function GET(req: NextRequest) {
 
   try {
     let query = ''
-    let params = {}
+    let products = []
 
     if (home === 'true') {
-      // Only fetch 4 latest products for homepage
+      // Try fetching featured products
       query = `
-        *[_type == "product"] | order(_createdAt desc)[0...4]{
+        *[_type == "product" && featured == true] | order(_createdAt desc)[0...4]{
           _id,
           name,
           rating,
           "image": images[0].asset->url,
           price,
           salesPrice,
-          
           featured
         }
       `
+      products = await sanityClient.fetch(query)
+
+      // If no featured products, fetch normal products
+      if (!products.length) {
+        query = `
+          *[_type == "product"] | order(_createdAt desc)[0...4]{
+            _id,
+            name,
+            rating,
+            "image": images[0].asset->url,
+            price,
+            salesPrice,
+            featured
+          }
+        `
+        products = await sanityClient.fetch(query)
+      }
     } else {
-      // Paginated full product list
+      // Paginated featured products
       query = `
-        *[_type == "product"] | order(_createdAt desc)[${start}...${start + limit}]{
+        *[_type == "product" && featured == true] | order(_createdAt desc)[${start}...${start + limit}]{
           _id,
           name,
           "images": images[].asset->url,
@@ -44,9 +59,28 @@ export async function GET(req: NextRequest) {
           "category": category->title
         }
       `
-    }
+      products = await sanityClient.fetch(query)
 
-    const products = await sanityClient.fetch(query, params)
+      // If no featured, fallback to normal paginated products
+      if (!products.length) {
+        query = `
+          *[_type == "product"] | order(_createdAt desc)[${start}...${start + limit}]{
+            _id,
+            name,
+            "images": images[].asset->url,
+            price, 
+            rating,
+            salesPrice,
+            sizes,
+            features,
+            description,
+            featured,
+            "category": category->title
+          }
+        `
+        products = await sanityClient.fetch(query)
+      }
+    }
 
     return NextResponse.json({ success: true, data: products })
   } catch (error) {
