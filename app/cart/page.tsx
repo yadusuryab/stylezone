@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
-const SHIPPING_COST = 100;
+const SHIPPING_COST = 30;
 
 
 function CartPage() {
