@@ -66,7 +66,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
       <script src="https://grookilteepsou.net/act/files/tag.min.js?z=9690416" data-cfasync="false" async></script>
+      </head>
       <body
         className={`${geistSans.className} ${geistMono.variable} antialiased`}
       >
